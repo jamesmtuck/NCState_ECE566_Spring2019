@@ -1,0 +1,21 @@
+services:
+  - docker
+
+language: cpp
+
+os:
+  - linux
+
+compiler:
+  - clang
+
+install:
+  - docker-compose build
+  - docker-compose up 
+
+script: 
+  - docker-compose run projects bash ./travis-ci-test.sh
+
+after_script:
+  - docker-compose stop
+  - docker-compose rm -f
