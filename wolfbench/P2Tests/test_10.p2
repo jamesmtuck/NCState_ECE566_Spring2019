@@ -1,0 +1,9 @@
+float test_10(float x)
+{
+  int j = 0;
+  float sum = 0.0;
+  for(j=0; j<10; j=j+1)
+    sum = sum + x;
+
+  return sum;
+}

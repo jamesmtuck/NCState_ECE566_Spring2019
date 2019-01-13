@@ -1,0 +1,4 @@
+int test_01(int a, int b, int c)
+{
+  return a+b+c;
+}

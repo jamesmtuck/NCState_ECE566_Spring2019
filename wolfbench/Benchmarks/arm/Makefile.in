@@ -1,0 +1,30 @@
+# /* For copyright information, see olden_v1.01/COPYRIGHT */
+
+include @top_builddir@/Makefile.defs
+
+SRC_DIR=@abs_srcdir@
+INSTALL_DIR=@prefix@/bin
+
+vpath %.c $(SRC_DIR)
+vpath %.cpp $(SRC_DIR)
+
+programs = arm
+
+.PHONY: all install
+
+all: $(addsuffix $(EXTRA_SUFFIX),$(programs)) 
+
+install: all
+
+DEFS    = -U__GNUC__ -D_NO_LONGLONG -DPLAIN -DOLDEN
+
+SOURCES = arm.c
+
+# test information
+INFILE  = @abs_srcdir@/i.4
+OUTFILE = $(addsuffix $(EXTRA_SUFFIX),$(programs)).output.stderr
+ARGS    = 
+COMPARE = @abs_srcdir@/arm.output.stderr $(OUTFILE)
+
+include @abs_top_srcdir@/Makefile.benchmark
+include @top_builddir@/Makefile.config

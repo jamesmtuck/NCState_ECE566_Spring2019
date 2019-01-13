@@ -1,0 +1,15 @@
+int test_04(int x, int y, int z, int w)
+{
+  int t0;
+  int t1;
+  int t2;
+  int t3;
+  int t4;
+
+  t0 = x*y*z*w;
+  t1 = t0/w*w;
+  t2 = t1+x*x;
+  t3 = 3*t2;
+  t4 = t2;
+  return t4;
+}

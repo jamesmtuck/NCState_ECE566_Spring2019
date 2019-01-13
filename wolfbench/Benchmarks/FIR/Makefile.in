@@ -1,0 +1,30 @@
+# /* For copyright information, see olden_v1.01/COPYRIGHT */
+
+include @top_builddir@/Makefile.defs
+
+SRC_DIR=@abs_srcdir@
+INSTALL_DIR=@prefix@/bin
+
+vpath %.c $(SRC_DIR)
+vpath %.cpp $(SRC_DIR)
+
+programs = fir
+
+.PHONY: all install
+
+all: $(addsuffix $(EXTRA_SUFFIX),$(programs))
+
+install: all 
+
+DEFS    = 
+
+SOURCES = fir.c
+
+# test information
+INFILE  = /dev/null
+OUTFILE = $(programs)$(EXTRA_SUFFIX).out
+ARGS    = @abs_srcdir@/input.pcm
+COMPARE = @abs_srcdir@/outputFloat.pcm outputFloat.pcm
+
+include @abs_top_srcdir@/Makefile.benchmark
+include @top_builddir@/Makefile.config

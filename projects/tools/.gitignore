@@ -1,0 +1,5 @@
+# Generated parser and scanner files
+parser.c
+parser.h
+scanner.c
+scanner.h

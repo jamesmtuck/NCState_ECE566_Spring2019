@@ -1,5 +1,12 @@
+# Emacs files
+*~
+
 # Prerequisites
 *.d
+
+# Ignore directories
+build
+tmp
 
 # Compiled Object files
 *.slo
@@ -30,3 +37,7 @@
 *.exe
 *.out
 *.app
+
+# Ignore raw data files
+*.pcm
+*.adpcm

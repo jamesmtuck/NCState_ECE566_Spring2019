@@ -1,0 +1,14 @@
+all:
+	make EXTRA_SUFFIX=.None OPTFLAGS="" test
+	make EXTRA_SUFFIX=.M OPTFLAGS="-mem2reg" test
+	make EXTRA_SUFFIX=.G OPTFLAGS="-gvn" test
+	make EXTRA_SUFFIX=.D OPTFLAGS="-dce" test
+	make EXTRA_SUFFIX=.E OPTFLAGS="-early-cse" test
+	make EXTRA_SUFFIX=.C OPTFLAGS="-constprop" test
+	make EXTRA_SUFFIX=.MED OPTFLAGS="-mem2reg -early-cse -dce" test
+	make EXTRA_SUFFIX=.MCEGD OPTFLAGS="-mem2reg -constprop -early-cse -gvn -dce" test
+	make EXTRA_SUFFIX=.O1 OPTFLAGS="-O1" test
+	make EXTRA_SUFFIX=.O2 OPTFLAGS="-O2" test
+	make EXTRA_SUFFIX=.O3 OPTFLAGS="-O3" test
+	../wolfbench/timing.py `find . -name *.time`
+	../wolfbench/fullstats.py insns `find . -name *.stats`

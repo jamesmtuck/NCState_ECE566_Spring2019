@@ -1,0 +1,40 @@
+
+.SUFFIXES: .bc .c .cpp .ll
+.PRECIOUS: .ll 
+
+# These rules only available with clang
+
+ifdef CLANG
+%.bc: %.c
+	$(CLANG) -w -std=c89 -emit-llvm -c -o $@ $< $(INCLUDE) $(CFLAGS) $(DEFS)
+%.bc: %.cpp
+	$(CLANG) -w -std=c89 -emit-llvm -c -o $@ $< $(INCLUDE) $(CFLAGS) $(DEFS)
+endif
+
+
+%.ll: %.c
+ifdef CLANG
+	$(CLANG) -w -std=c89 -emit-llvm -S -o $@ $< $(INCLUDE) $(CFLAGS) $(DEFS)
+else
+	$(GCC) -fplugin=$(DRAGONEGG) -fplugin-arg-dragonegg-emit-ir -S -o $@ $< $(INCLUDE) $(CFLAGS) $(DEFS)
+endif
+
+%.ll: %.cpp
+ifdef CLANG
+	@$(CLANG) -w -std=c89 -emit-llvm -S -o $@ $< $(INCLUDE) $(CFLAGS) $(DEFS)
+else
+	@$(GCC) -fplugin=$(DRAGONEGG) -fplugin-arg-dragonegg-emit-ir -S -o $@ $< $(INCLUDE) $(CFLAGS) $(DEFS)
+endif
+
+%.ll: %.bc
+	@$(LLVM_DIS) $<
+ifdef VERBOSE
+	@cat $@
+endif
+
+%.bc: %.ll
+	@$(LLVMAS) -o $@ $<      
+
+
+# Do not remove this. It does DO SOMETHING! It over-rides an implicit make rule!
+% : %.c

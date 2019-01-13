@@ -1,0 +1,111 @@
+
+.SUFFIXES: .tune.bc .opt.bc .link.bc .bc .prof.bc
+.PRECIOUS: .tune.bc
+
+.PHONY: install clean test profile
+
+EXE = $(addsuffix $(EXTRA_SUFFIX),$(programs))
+EXEOUT = $(addsuffix .out.time,$(EXE))
+#EXEOUT = $(addsuffix .time,$(OUTFILE))
+
+$(EXE): $(EXE).prof.bc
+ifdef CUSTOMCODEGEN
+ifdef DEBUG
+	gdb --args $(CUSTOMCODEGEN) $(addsuffix .prof.bc,$@) $(addsuffix .s,$@)
+else
+	$(CUSTOMCODEGEN)  $(addsuffix .prof.bc,$@) $(addsuffix .s,$@)
+endif
+	echo [built $@.s]
+endif
+ifdef FAULTINJECTTOOL	
+	$(FAULTINJECTTOOL) $(FIFLAGS) -o $(subst .bc,.fi.bc,$<) $< 
+ifdef CLANG
+	@$(CLANG) $(LIBS) $(HEADERS) -o $@ $(subst .bc,.fi.bc,$<) -lm
+else
+	@$(LLC) -o $(addsuffix .s,$@) $(subst .bc,.fi.bc,$<)
+	@$(GCC) $(LIBS) $(HEADERS) -o $@ $(addsuffix .s,$@) -lm
+endif
+	@echo [built $(EXE)]
+else
+ifdef CLANG
+	@$(LLC) -O2 -o $(addsuffix .s,$@) $(addsuffix .prof.bc,$@)
+	@$(CLANG) $(LIBS) $(HEADERS) -o $@ $(addsuffix .s,$@) -lm
+else
+	@$(LLC) -o $(addsuffix .s,$@) $(addsuffix .prof.bc,$@)
+	@$(GCC) $(LIBS) $(HEADERS) -o $@ $(addsuffix .s,$@) -lm
+endif
+	@echo [built $(EXE)]
+endif
+#ifdef EXTRA_SUFFIX
+#	cp $@ $(addsuffix $(EXTRA_SUFFIX),$@)
+#endif
+
+%.prof.bc: %.tune.bc
+ifdef PROFILER
+	@$(PROFILER) $(PROFFLAGS) -o $@ $<
+else
+	@cp $< $@
+endif
+
+%.tune.bc: %.opt.bc
+ifdef DEBUG
+	gdb --args $(CUSTOMTOOL) $(CUSTOMFLAGS) $< $@
+else
+	$(CUSTOMTOOL) $(CUSTOMFLAGS) $< $@
+endif
+
+%.opt.bc: %.link.bc
+	$(OPT) $(OPTFLAGS) -o $@ $<
+
+%.link.bc: $(SOURCES:.c=.bc)
+	$(LLVM_LINK) -o $@ $^
+
+clean:
+	@rm -Rf *.s *.bc $(EXE) *time1 *time2 *time3 
+
+cleanall:
+	@rm -Rf *.s *.bc $(addsuffix *,$(programs)) $(OUTFILE) *.out *.time *.time1 *.time2 *.time3 *.stats
+
+install:
+	@mkdir -p $(INSTALL_DIR)
+	@cp $(EXE) $(INSTALL_DIR)/
+	@echo [installed $(EXE)]
+
+test: $(EXEOUT)
+
+ftest:
+ifdef INFILE
+	./$(EXE) $(ARGS) < $(INFILE) > /dev/null
+else
+	./$(EXE) $(ARGS) > /dev/null
+endif
+
+$(EXEOUT): $(EXE)
+	@echo [timing $(EXE)]
+ifdef VERBOSE
+	$(RUN) $(INFILE) $(OUTFILE) ./$(EXE) $(ARGS)
+	@mv $(OUTFILE).time $(EXEOUT).time
+	#@rm -Rf *.time1 *.time2 *.time3
+else
+	@$(RUN) $(INFILE) $(OUTFILE) ./$(EXE) $(ARGS) 
+	@mv $(OUTFILE).time $(EXEOUT).time
+	@rm -Rf *.time1 *.time2 *.time3
+endif
+
+
+compare: $(EXEOUT)
+ifdef VERBOSE
+	 $(DIFF) -v $(programs) $(COMPARE) 
+else
+	 @$(DIFF) $(programs) $(COMPARE) 
+endif
+
+profile:
+	$(MAKE) -f Makefile EXTRA_SUFFIX=.prof1 PROFFLAGS="-do-profile" all
+ifdef INFILE
+	./$(addsuffix .prof1,$(programs)) $(ARGS) < $(INFILE) > /dev/null
+else
+	./$(addsuffix .prof1,$(programs)) $(ARGS) > /dev/null
+endif
+	make clean
+	make -f Makefile PROFFLAGS="-use-profile -gcm -summary"

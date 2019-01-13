@@ -1,0 +1,33 @@
+
+int test_08(int x, int y)
+{
+  int j;
+
+  j=0;
+
+  if (x < 0)
+    x = -x;
+  else
+    ;
+
+  if (y < 0)
+    y = -y;
+  else 
+    ;
+
+  if (x > y && y > 0)
+    {
+      while (x > y)
+	{
+	  x = x - y;
+	  j = j+1;
+	}
+    }
+  else
+    {
+      j = -1;
+    }
+
+  return j;
+}
+

@@ -1,0 +1,33 @@
+# Config settings
+@LLVM@
+@DEBUG@
+
+# Tools we need
+CUSTOMTOOL=@CUSTOMTOOL@
+CUSTOMCODEGEN=@CUSTOMCODEGEN@
+FAULTINJECTTOOL=@FAULTINJECTTOOL@
+PROFILER=@PROFILER@
+P1TOOL=@P1TOOL@
+P2TOOL=@P2TOOL@
+CLANG=@CLANG@
+OPT=@OPT@
+LLC=@LLC@
+LLVMAS=@LLVMAS@
+LLVM_LINK=@LLVM_LINK@
+LLVM_CONFIG=@LLVM_CONFIG@
+LLVM_DIS=@LLVM_DIS@
+DRAGONEGG=@DRAGONEGG@
+GCC=@GCC@
+
+LIBS=
+PLIBS=`cd @abs_top_srcdir@/../projects/install/lib/; pwd`/librt.a `$(LLVM_CONFIG) --libdir`/libprofile_rt.a
+
+RUN=@abs_top_srcdir@/RunSafelyAndStable.sh 60 1 
+
+DIFF=@abs_top_srcdir@/RunDiff.sh
+
+EXTRA_SUFFIX=@EXTRA_SUFFIX@
+
+ifdef DEBUG
+CFLAGS+=-g
+endif

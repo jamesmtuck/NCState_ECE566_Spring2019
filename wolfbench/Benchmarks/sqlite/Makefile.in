@@ -1,0 +1,30 @@
+# /* For copyright information, see olden_v1.01/COPYRIGHT */
+
+include @top_builddir@/Makefile.defs
+
+SRC_DIR=@abs_srcdir@
+INSTALL_DIR=@prefix@/bin
+
+vpath %.c $(SRC_DIR)
+vpath %.cpp $(SRC_DIR)
+
+programs = sql
+
+.PHONY: all install
+
+all: $(addsuffix $(EXTRA_SUFFIX),$(programs))
+
+install: all
+
+DEFS    = -DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION
+
+SOURCES = test.c sqlite3.c
+
+# test information
+INFILE  = /dev/null
+OUTFILE = $(programs)$(EXTRA_SUFFIX).out
+ARGS    = 
+COMPARE = @abs_srcdir@/output.sql $(OUTFILE)
+
+include @abs_top_srcdir@/Makefile.benchmark
+include @top_builddir@/Makefile.config

@@ -1,0 +1,4 @@
+int test_14(int x, int y)
+{
+  return x||y;
+}

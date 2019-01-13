@@ -1,0 +1,35 @@
+opt:
+	make EXTRA_SUFFIX=.None OPTFLAGS="" test
+	make EXTRA_SUFFIX=.O1 OPTFLAGS="-O1" test
+	make EXTRA_SUFFIX=.O2 OPTFLAGS="-O2" test
+	make EXTRA_SUFFIX=.O3 OPTFLAGS="-O3" test
+	../wolfbench/timing.py `find . -name *.time`
+	../wolfbench/fullstats.py insns `find . -name *.stats`
+
+all:
+	make EXTRA_SUFFIX=.MED OPTFLAGS="-mem2reg -early-cse -adce" test
+	make EXTRA_SUFFIX=.MPEGD OPTFLAGS="-mem2reg -sccp -early-cse -gvn -adce" test
+	make EXTRA_SUFFIX=.AMPEGD OPTFLAGS="-basicaa -mem2reg -sccp -early-cse -gvn -adce" test
+	make EXTRA_SUFFIX=.XMPEGD OPTFLAGS="-no-aa -mem2reg -sccp -early-cse -gvn -adce" test
+	make EXTRA_SUFFIX=.O1 OPTFLAGS="-O1" test
+	make EXTRA_SUFFIX=.O2 OPTFLAGS="-O2" test
+	make EXTRA_SUFFIX=.O3 OPTFLAGS="-O3" test
+	../wolfbench/timing.py `find . -name *.time`
+	../wolfbench/fullstats.py insns `find . -name *.stats`
+
+extra:
+	make EXTRA_SUFFIX=.None OPTFLAGS="" test
+	make EXTRA_SUFFIX=.N OPTFLAGS="-inline" test
+	make EXTRA_SUFFIX=.M OPTFLAGS="-mem2reg" test
+	make EXTRA_SUFFIX=.G OPTFLAGS="-gvn" test
+	make EXTRA_SUFFIX=.D OPTFLAGS="-adce" test
+	make EXTRA_SUFFIX=.E OPTFLAGS="-early-cse" test
+	make EXTRA_SUFFIX=.P OPTFLAGS="-sccp" test
+	make EXTRA_SUFFIX=.R OPTFLAGS="-scalarrepl" test
+	make EXTRA_SUFFIX=.V OPTFLAGS="-indvars" test
+	make EXTRA_SUFFIX=.I OPTFLAGS="-licm" test
+	make EXTRA_SUFFIX=.T OPTFLAGS="-loop-reduce" test
+	make EXTRA_SUFFIX=.U OPTFLAGS="-loop-unswitch" test
+
+clean:
+	make clean
