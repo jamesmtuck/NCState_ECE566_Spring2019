@@ -1,0 +1,13 @@
+( 1
+	 ( uid 1 )
+	 ( serial
+		 ( weight 99 )
+		 ( numExe 685 )
+		 ( exeCycles 39171786 )
+		 ( totalIter 683747 )
+		 ( avgIter 998 )
+		 ( avgIterCycle 57 )
+		 ( minCycle 10 )
+		 ( maxCycle 622 )
+	)
+ )

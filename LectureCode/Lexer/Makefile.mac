@@ -1,0 +1,7 @@
+
+words:
+	flex -owords.c words.lex
+	gcc -o words words.c -ll
+
+clean:
+	@rm -Rf words words.c

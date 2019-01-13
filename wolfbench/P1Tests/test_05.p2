@@ -1,0 +1,8 @@
+int test_05(int x)
+{
+  int j;
+  while(x>0) {
+     j++; x=x-1;
+  }
+  return j;
+}

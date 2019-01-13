@@ -1,0 +1,79 @@
+
+.SUFFIXES: .tune.bc .opt.bc .link.bc .bc .prof.bc
+.PRECIOUS: .tune.bc
+
+.PHONY: %-install
+
+$(exes): $(addsuffix .prof.bc,$(exes))
+ifdef CUSTOMCODEGEN
+ifdef DEBUG
+	gdb --args $(CUSTOMCODEGEN) $(addsuffix .prof.bc,$@) $(addsuffix .s,$@)
+else
+	$(CUSTOMCODEGEN) $(addsuffix .prof.bc,$@) $(addsuffix .s,$@)
+endif
+	echo [built $@.s]
+endif
+ifdef FAULTINJECTTOOL	
+	$(FAULTINJECTTOOL) $(FIFLAGS) -o $(addsuffix .prof.fi.bc,$@) $(addsuffix .prof.bc,$@) 
+ifdef CLANG
+	$(CLANG) $(LIBS) $(HEADERS) -o $@ $(addsuffix .prof.fi.bc,$@)
+else
+	$(LLC) -o $(addsuffix .s,$@) $(addsuffix .prof.fi.bc,$@)
+	$(GCC) $(LIBS) $(HEADERS) -o $@ $(addsuffix .s,$@)
+endif
+	echo [built $@]
+else
+ifdef CLANG
+	$(CLANG) $(LIBS) $(HEADERS) -o $@ $<
+else
+	$(LLC) -o $(addsuffix .s,$@) $(addsuffix .prof.bc,$@)
+	$(GCC) $(LIBS) $(HEADERS) -o $@ $(addsuffix .s,$@)
+endif
+	echo [built $@]
+endif
+
+
+$(addsuffix .prof.bc,$(exes)): %.prof.bc: %.tune.bc
+ifdef PROFILER
+	$(PROFILER) $(PROFFLAGS) -o $@ $<
+else
+	cp $< $@
+endif
+
+$(addsuffix .tune.bc,$(exes)): %.tune.bc: %.opt.bc
+	$(CUSTOMTOOL) $(CUSTOMFLAGS) $< $@
+
+$(addsuffix .opt.bc,$(exes)): %.opt.bc: %.link.bc
+	$(OPT) $(OPTFLAGS) -o $@ $<
+
+$(addsuffix .link.bc,$(exes)): %.link.bc: %.bc
+	$(LLVM_LINK) -o $@ $<
+
+ifdef EXTRA_SUFFIX
+$(addsuffix .bc,$(exes)): $(subst $(EXTRA_SUFFIX),,$(addsuffix .bc,$(exes)))
+	@cp $< $@
+endif	    
+
+clean:
+	rm -Rf *.bc $(exes) $(addsuffix .*,$(programs))
+
+cleanall:
+	rm -Rf *.bc $(exes) $(addsuffix .*,$(programs)) *.stats *.time*
+
+%-install:
+	@mkdir -p $(INSTALL_DIR)
+	@cp $* $(INSTALL_DIR)/
+	@echo [installed $*]
+
+%-test:
+	@./$*
+
+%-ftest:
+	@./$*
+
+%-profile:
+	@$(MAKE) -f Makefile EXTRA_SUFFIX=.prof1 PROFFLAGS="-do-profile" all
+	@$(MAKE) -f Makefile ftest
+	@make clean
+	@make -f Makefile PROFFLAGS="-use-profile -gcm -summary"
+	

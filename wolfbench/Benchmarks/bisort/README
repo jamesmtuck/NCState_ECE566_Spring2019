@@ -1,0 +1,22 @@
+/* For copyright information, see olden_v1.01/COPYRIGHT */
+******************
+olden_v1.01/benchmarks/bisort/README
+June 1996
+Martin C. Carlisle
+
+this directory contains the Bitonic Sort benchmark:
+G. Bilardi and A. Nicolau.  "Adaptive Bitonic Sorting:  An optimal
+parallel algorithm for shared-memory machines."  SIAM J. Comput.
+18(2):216-228, 1989.
+
+as implemented for Olden by Martin C. Carlisle
+******************
+
+Makefile - "make bisort" makes executable
+
+args.c - handle command line arguments
+bitonic.c - main routines
+swap.c - used to swap subtrees
+node.h - declarations
+code.h - prototypes
+

@@ -1,0 +1,2 @@
+*.adpcm filter=lfs diff=lfs merge=lfs -text
+*.pcm filter=lfs diff=lfs merge=lfs -text

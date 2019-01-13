@@ -1,0 +1,10 @@
+int test_03(int a, int b, int c)
+{
+  int t0;
+  int t1;
+  int t2;
+  t0 = a+b+c;
+  t1 = 10*t0;
+  t2 = t1/10;
+  return t2;
+}

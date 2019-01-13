@@ -1,0 +1,36 @@
+include @top_builddir@/Makefile.defs
+
+SRC_DIR=@abs_srcdir@
+INSTALL_DIR=@prefix@/bin
+
+vpath %.c $(SRC_DIR)
+vpath %.cpp $(SRC_DIR)
+vpath %.p1 $(SRC_DIR)
+
+programs = \
+	test_00 \
+	test_01 \
+	test_02 \
+	test_03 \
+	test_04 
+	test_05 \
+	test_06 \
+	test_07 \
+	test_08 \
+	test_09 
+
+.PHONY: all install
+
+all: $(programs)
+
+install: all $(addsuffix -install,$(programs))
+
+test: all $(addsuffix -test,$(programs))
+	@top_srcdir@/summarize.py $(addsuffix -test,$(programs))
+
+cleanall:
+	@rm -Rf $(programs) $(addsuffix -test,$(programs)) $(addsuffix .s,$(programs))
+
+include @top_srcdir@/Makefile.P1
+include @top_builddir@/Makefile.config
+
