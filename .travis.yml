@@ -5,8 +5,8 @@ language: cpp
 
 os:
   - linux
-  - osx
-  - windows
+#  - osx
+#  - windows
 
 compiler:
   - clang
