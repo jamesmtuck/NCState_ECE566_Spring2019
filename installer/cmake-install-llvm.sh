@@ -6,7 +6,7 @@ INSTALL_DIR=`pwd`/install
 
 PYTHON=python
 CLASS=566
-VERSION="4.0.1"
+VERSION="7.0.1"
 TARGET=
 
 URL="http://releases.llvm.org"
@@ -176,11 +176,12 @@ else
     mkdir -p $BUILD_DIR
     mkdir -p $INSTALL_DIR
     cd $BUILD_DIR
-    cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR -DLLVM_OPTIMIZED_TABLEGEN=On  ..
-    cmake --build .
+    cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR -DLLVM_OPTIMIZED_TABLEGEN=On  ..
+    ninja install
+    #cmake --build .
     #make cxx
     #make check-libcxx
-    cmake --build . --target install
+    #cmake --build . --target install
 fi
 
 if [ -x $INSTALL_DIR/bin/clang ]; then
