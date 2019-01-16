@@ -6,6 +6,6 @@ pushd .
 cd projects && mkdir build && cd build && cmake -DLLVM_DIR=/usr/local/lib/cmake/llvm .. && cmake --build .
 popd
 make -C Tutorials/1 clean all
-pushd
+pushd .
 mkdir p0-test && cd p0-test && ../wolfbench/configure && make all 
 popd
