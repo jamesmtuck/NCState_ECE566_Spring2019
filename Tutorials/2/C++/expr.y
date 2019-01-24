@@ -153,7 +153,6 @@ int main() {
     raw_fd_ostream OS("main.bc",EC,sys::fs::F_None);  
     WriteBitcodeToFile(*M,OS);
 
-
   } else {
     printf("There was a problem! Read error messages above.\n");
   }
