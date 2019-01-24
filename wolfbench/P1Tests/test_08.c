@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <sys/types.h>
-extern int64_t test_08(int64_t,int64_t,int64_t,int64_t);
+extern int64_t test_08(int64_t,int64_t,int64_t);
 
-int test_function(int x, int y, int z, int w)
+int test_function(int a, int b, int c)
 {
-  return 16;
+  return a-b+c;
 }
 
 int main()
@@ -14,10 +14,10 @@ int main()
   int errors=0;
   int success=0;
 
-  for (i=1; i<5; i++)
-    for (j=1; j<5; j++)
-      for (k=1; k<20; k+=7)
-	if (test_08(i,j,k,3)!=test_function(i,j,k,3))
+  for (i=0; i<10; i++)
+    for (j=100; j<120; j++)
+      for (k=-10; k<0; k++)
+	if (test_08(i,j,k)!=test_function(i,j,k))
 	  errors++;
 	else
 	  success++;
