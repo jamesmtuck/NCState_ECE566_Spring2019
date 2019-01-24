@@ -34,15 +34,15 @@ struct TmpMap{
 
 struct TmpMap *map = NULL;    /* important! initialize to NULL */
 
-void add_val(char *tmp, void* val) { 
+void map_insert(char *key, void* val) { 
   struct TmpMap *s; 
   s = malloc(sizeof(struct TmpMap)); 
-  s->key = strdup(tmp); 
+  s->key = strdup(key); 
   s->val = val; 
   HASH_ADD_KEYPTR( hh, map, s->key, strlen(s->key), s ); 
 }
 
-void * get_val(char *tmp) {
+void * map_find(char *tmp) {
   struct TmpMap *s;
   HASH_FIND_STR( map, tmp, s );  /* s: output pointer */
   if (s) 
@@ -77,6 +77,8 @@ program: define stmtlist
 { 
   /* 
     IMPLEMENT: return value, program is over
+
+    Hint: the following code is not sufficient
   */  
 
   LLVMBuildRet(Builder,LLVMConstInt(LLVMInt64Type(),0,0));
@@ -117,6 +119,10 @@ define: DEF ID LBRACKET NUM RBRACKET SEMI
   LLVMPositionBuilderAtEnd(Builder,BasicBlock);
 }
 ;
+
+/*
+   IMPLMENT ALL THE RULES BELOW HERE!
+ */
 
 stmtlist:  stmtlist stmt 
 | stmt                   

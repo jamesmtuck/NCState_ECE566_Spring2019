@@ -1,0 +1,40 @@
+
+.SUFFIXES: .tune.bc .opt.bc .link.bc .bc
+.PRECIOUS: .tune.bc
+
+.PHONY: %-install
+
+ifdef QUIET
+VERB:=@
+else
+VERB:=
+endif
+
+%: %.all.bc
+ifdef CLANG
+	$(VERB) $(CLANG) $(LIBS) $(HEADERS) -o $@ $^
+else
+	$(VERB) $(LLC) -o $(addsuffix .s,$@) $^
+	$(VERB) $(GCC) $(LIBS) $(HEADERS) -o $@ $(addsuffix .s,$@)	
+endif
+
+%.all.bc: %.bc %.p1.bc
+	$(VERB) $(LLVM_LINK) -o $@ $^	  
+
+%.p1.bc:%.p1
+ifdef DEBUG
+	/usr/bin/gdb --args $(P1TOOL) $< $@
+else
+	$(VERB) $(P1TOOL) $< $@
+endif
+
+clean:
+	$(VERB) rm -Rf *.bc $(programs) *-test *.ll
+
+%-build:
+	$(VERB) $(P1TOOL)  $(addsuffix .p1,$*)  $(addsuffix .bc,$*)
+	llvm-dis $(addsuffix .bc,$*)
+	$(VERB) $(CLANG) $(LIBS) $(HEADERS) -o $* $(addsuffix .c,$*) $(addsuffix .bc,$*)
+
+%-test:
+	$(VERB) ./$* > $@ 
