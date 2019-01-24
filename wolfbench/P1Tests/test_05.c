@@ -4,7 +4,7 @@ extern int64_t test_05(int64_t,int64_t,int64_t,int64_t);
 
 int test_function(int x, int y, int z, int w)
 {
-  return x + y + z + w;
+  return w;
 }
 
 int main()
