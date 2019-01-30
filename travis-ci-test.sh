@@ -13,5 +13,5 @@ pushd .
 mkdir p0-test && cd p0-test && ../wolfbench/configure && make all 
 popd
 pushd .
-mkdir p0-test && cd p0-test && ../wolfbench/configure --enable-p1=`cd ../projects/build/tools/p1; pwd`/p1 && make all
+mkdir p1-test && cd p1-test && ../wolfbench/configure --enable-p1=`cd ../projects/build/tools/p1; pwd`/p1 
 popd
