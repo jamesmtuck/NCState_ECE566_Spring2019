@@ -14,16 +14,18 @@
 #include "llvm/Support/ToolOutputFile.h"
 #include "llvm/Support/FileSystem.h"
 
+using namespace llvm;
+
 #include "expr.y.hpp"
 int yyerror(char *s);
 
 int yylex();
-int yyerror(char *);
+int yyerror(const char *);
 
 
 %}
 
-%option noyywrap
+%option noyywrap noinput nounput
 
 %% // begin tokens
 
@@ -55,7 +57,7 @@ int yyerror(char *);
 %% // end tokens
 
 
-int yyerror(char *s)
+int yyerror(const char *s)
 {
   fprintf(stderr,"%d: %s %s\n", yylineno, s, yytext);
   return 0;

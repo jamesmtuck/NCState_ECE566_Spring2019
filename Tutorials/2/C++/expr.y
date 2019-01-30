@@ -18,9 +18,12 @@ static LLVMContext TheContext;
 static IRBuilder<> Builder(TheContext);
 
 int regCnt = 8;
+int lastReg = 0;
 
 int yylex();
-int yyerror(char *);
+int yyerror(const char *);
+
+Value * regs[8];
 
 %}
 
@@ -31,10 +34,12 @@ int yyerror(char *);
 %union {
   int reg;
   int imm;
+  Value * val;
 }
 
-%type <reg> REG expr
+%type <reg> REG 
 %type <imm> IMMEDIATE
+%type <val> expr
 
 %start program
 
@@ -43,76 +48,95 @@ int yyerror(char *);
 
 program: REG ASSIGN expr SEMI 
 {
-  printf("# Output program : REG (%d) ASSIGN expr SEMI\n", $1);
-  printf("ADD R%d, R%d, 0\n", $1, $3);
+  //printf("# Output program : REG (%d) ASSIGN expr SEMI\n", $1);
+  //printf("ADD R%d, R%d, 0\n", $1, $3);
+  regs[$1] = $3;
+  lastReg = $1;
 } 
 | program REG ASSIGN expr SEMI
 {
-  printf("# Output program : REG (%d) ASSIGN expr SEMI\n", $2);
-  printf("ADD R%d, R%d, 0\n", $2, $4);
-
+  //printf("# Output program : REG (%d) ASSIGN expr SEMI\n", $2);
+  //printf("ADD R%d, R%d, 0\n", $2, $4);
+  regs[$2] = $4;
+  lastReg = $2;
 } 
 
 | program SEMI
 {
+  Builder.CreateRet(regs[lastReg]);
   return 0;
 }
 ;
 expr: 
  IMMEDIATE                 
  {
-   int reg = regCnt++;
-   printf("# Output for expr : IMMEDIATE (%d) \n", $1);
-   printf("AND R%d, R%d, 0\n", reg, reg);
-   printf("ADD R%d, R%d, %d\n", reg, reg, $1);
-   $$ = reg;
+   //int reg = regCnt++;
+   ///printf("# Output for expr : IMMEDIATE (%d) \n", $1);
+   //printf("AND R%d, R%d, 0\n", reg, reg);
+   //printf("ADD R%d, R%d, %d\n", reg, reg, $1);
+   $$ = Builder.getInt32($1);
+   
+   ConstantInt *ci = dyn_cast<ConstantInt*>($$);
+   if (ci != NULL) {
+     printf("%lld\n", ci->getZExtValue());
+   }
+
  }
 | REG
  {
-   printf("# Output expr : REG (%d) \n",$1);
-   $$ = $1;
+   //printf("# Output expr : REG (%d) \n",$1);
+   //$$ = $1;
+   $$ = regs[$1];
  }
 | expr PLUS expr  
  {
-  printf("# Output expr : expr PLUS expr \n");
+   /*printf("# Output expr : expr PLUS expr \n");
   int reg = regCnt++;
   printf("ADD R%d, R%d, R%d\n", reg, $1, $3);
-  $$ = reg;
+  $$ = reg;*/
+   $$ = Builder.CreateAdd($1,$3);
  }
 
 | expr MINUS expr 
  {
-  printf("# Output for expr : expr MINUS expr \n");
+   /* printf("# Output for expr : expr MINUS expr \n");
 
   int reg = regCnt++;
   printf("SUB R%d, R%d, R%d\n", reg, $1, $3);
-  $$ = reg;  
+  $$ = reg;*/  
+   $$ = Builder.CreateSub($1,$3);
 }
 
 
 | LPAREN expr RPAREN 
  {
-  printf("# Output for expr : LPAREN expr RPAREN \n");
-  $$ = $2;
+   /*printf("# Output for expr : LPAREN expr RPAREN \n");
+     $$ = $2;*/
+   $$ = $2;
  }
 
 | MINUS expr 
  {
-  printf("expr : MINUS expr \n");
+   /*printf("expr : MINUS expr \n");
   
   int reg = regCnt++;
   printf("NOT R%d, R%d\n", reg, $2);
   printf("ADD R%d, R%d, 1\n", reg, reg);
-  $$ = reg;  
+  $$ = reg;  */
+      $$ = Builder.CreateNeg($2);
  }
 
 | LBRACKET expr RBRACKET 
  {
-  printf("#Output for expr : LBRACKET expr RBRACKET \n");
+   /*printf("#Output for expr : LBRACKET expr RBRACKET \n");
 
   int reg = regCnt++;
   printf("LDR R%d, R%d, 0\n", reg, $2);
-  $$ = reg;  
+  $$ = reg;*/  
+   Value * tmp = Builder.CreateIntToPtr($2,   
+	      PointerType::get(Builder.getInt32Ty(),0));
+
+   $$ = Builder.CreateLoad(tmp);
  }
 
 ;
@@ -146,8 +170,10 @@ int main() {
     // all is good
 
     // Build the return instruction for the function
-    Builder.CreateRet(Builder.getInt32(0));
+    //Builder.CreateRet(Builder.getInt32(0));
     
+    //M->dump();
+
     //Write module to file
     std::error_code EC;
     raw_fd_ostream OS("main.bc",EC,sys::fs::F_None);  
