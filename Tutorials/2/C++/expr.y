@@ -76,9 +76,9 @@ expr:
    //printf("ADD R%d, R%d, %d\n", reg, reg, $1);
    $$ = Builder.getInt32($1);
    
-   ConstantInt *ci = dyn_cast<ConstantInt*>($$);
+   ConstantInt *ci = dyn_cast<ConstantInt>($$);
    if (ci != NULL) {
-     printf("%lld\n", ci->getZExtValue());
+     printf("%ld\n", ci->getZExtValue());
    }
 
  }
