@@ -1,6 +1,8 @@
 version: '3'
 services:
   projects:
+    network_mode: host
+    privileged: true
     build: .
     volumes:
     - .:/projects
