@@ -70,6 +70,19 @@ stmtlist :    stmt
 ;
 
 stmt:   ID ASSIGN expr SEMI              /* expression stmt */
+{
+  // Look to see if we already allocated it
+  LLVMValueRef var = map_find($1);
+  if (var==NULL) {
+     // We haven’t so make a spot on the stack
+     var = LLVMBuildAlloca(Builder,LLVMInt64Type(),$1);
+     // remember this location and associate it with $1
+     map_insert($1,var);
+  }
+  // store $3 into $1’s location in memory
+  LLVMBuildStore(Builder,$3,var);
+}
+
       | IF LPAREN expr RPAREN LBRACE stmtlist RBRACE   /*if stmt*/     
       | WHILE LPAREN expr RPAREN LBRACE stmtlist RBRACE /*while stmt*/
       | SEMI /* null stmt */
@@ -80,11 +93,12 @@ expr:
 
  IMMEDIATE                 
  {
-    $$ = LLVMConstInt(LLVMInt32Type(),$1,0);
+    $$ = LLVMConstInt(LLVMInt64Type(),$1,0);
  }
 | ID
 {
-  
+  LLVMValueRef alloca = map_find($1);
+  $$ = LLVMBuildLoad(Builder,alloca,$1);
 }  
 | expr PLUS expr  
 {
@@ -115,7 +129,16 @@ expr:
 }  
 | NOT expr
 {
-
+  LLVMValueRef zero = LLVMConstInt(LLVMTypeOf($2),0,1); 
+  LLVMValueRef icmp = LLVMBuildICmp(Builder, LLVMIntEQ, $2,
+                                  zero,"logical.not");
+  //$$ = LLVMBuildSelect(Builder, 
+  //		       icmp, // condition 
+  //                   LLVMConstInt(LLVMInt64Type(),1,1),   // if-true
+  //LLVMConstInt(LLVMInt64Type(), 0, 1), // if-false
+  //"logical.not");
+  
+  $$ = LLVMBuildZExt(Builder, icmp, LLVMInt64Type(),"logical.not");
 }
 ;
 
@@ -128,7 +151,7 @@ int main() {
   LLVMModuleRef Module = LLVMModuleCreateWithName("Tutorial3");
   
   // Make a void function type with no arguments
-  LLVMTypeRef IntFnTy = LLVMFunctionType(LLVMInt32Type(),NULL,0,0);
+  LLVMTypeRef IntFnTy = LLVMFunctionType(LLVMInt64Type(),NULL,0,0);
   
   // Make a void function named main (the start of the program!)
   LLVMValueRef Fn = LLVMAddFunction(Module,"main",IntFnTy);
@@ -148,7 +171,7 @@ int main() {
     
     LLVMDumpModule(Module);
     
-     LLVMWriteBitcodeToFile(Module,"main.bc");
+    LLVMWriteBitcodeToFile(Module,"main.bc");
     // all is good
   } else {
     printf("There was a problem! Read error messages above.\n");
