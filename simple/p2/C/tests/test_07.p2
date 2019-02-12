@@ -1,0 +1,18 @@
+int test_07(int x, int y)
+{
+  int j;
+
+  j = 0;
+
+  while (j<10)
+    {
+      if (x > y)
+	x = x-y;
+      else
+	x = x+y;
+
+      j=j+1;
+    }
+
+  return x;
+}

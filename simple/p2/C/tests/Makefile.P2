@@ -1,0 +1,55 @@
+
+.SUFFIXES: .tune.bc .opt.bc .link.bc .bc
+.PRECIOUS: .tune.bc
+
+.PHONY: %-install
+
+CLANG = clang
+LLVM_LINK = llvm-link
+P2TOOL = ../p2
+
+ifdef QUIET
+VERB:=@
+else
+VERB:=
+endif
+
+ifdef DEBUG
+GDB = gdb --args 
+else
+GDB = 
+endif
+
+%: %.all.bc
+ifdef CLANG
+	$(VERB) $(CLANG) $(LIBS) $(HEADERS) -o $@ $^
+else
+	$(VERB) $(LLC) -o $(addsuffix .s,$@) $^
+	$(VERB) $(GCC) $(LIBS) $(HEADERS) -o $@ $(addsuffix .s,$@)	
+endif
+
+%.all.bc: %.bc %-p2.bc
+	$(VERB) $(LLVM_LINK) -o $@ $^
+
+%-p2.bc:%.p2
+ifdef VERBOSE
+	$(GDB) $(P2TOOL) -o $@ $<
+else
+	$(VERB) $(GDB) $(P2TOOL) -o $@ $<
+endif
+
+%.bc: %.c
+	$(VERB) $(CLANG) $(LIBS) $(HEADERS) -c -emit-llvm -o $@ $^
+
+clean:
+	$(VERB) rm -Rf *.bc $(programs) *-test
+
+%-test:
+	$(VERB) ./$* > $@ 
+
+%-install:
+	$(VERB) mkdir -p $(INSTALL_DIR)
+	$(VERB) cp $* $(INSTALL_DIR)/$*$(EXTRA_SUFFIX)
+	$(VERB) echo [installed $*$(EXTRA_SUFFIX)]
+
+%:%.c

@@ -1,0 +1,4 @@
+int test_02(int a, int b, int c)
+{
+  return (a+b) + 2*c - c;
+}
