@@ -70,11 +70,6 @@ expr:
  IMMEDIATE                 
  {
    $$ = Builder.getInt32($1);
-   
-   ConstantInt *ci = dyn_cast<ConstantInt>($$);
-   if (ci != NULL) {
-     printf("%ld\n", ci->getZExtValue());
-   }
  }
 | ID
  {

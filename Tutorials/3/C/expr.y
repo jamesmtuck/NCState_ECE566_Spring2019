@@ -34,6 +34,9 @@ void yyerror(const char*);
 int yylex();
 
 LLVMBuilderRef  Builder;
+LLVMValueRef    Fn;
+
+LLVMBasicBlockRef BBjoin;
 
 %}
 
@@ -48,6 +51,7 @@ LLVMBuilderRef  Builder;
   char * id;
   int imm;
   LLVMValueRef val;
+  LLVMBasicBlockRef bb;
 }
 
 %type <id> ID
@@ -83,8 +87,79 @@ stmt:   ID ASSIGN expr SEMI              /* expression stmt */
   LLVMBuildStore(Builder,$3,var);
 }
 
-      | IF LPAREN expr RPAREN LBRACE stmtlist RBRACE   /*if stmt*/     
-      | WHILE LPAREN expr RPAREN LBRACE stmtlist RBRACE /*while stmt*/
+| IF LPAREN expr RPAREN {
+  // first mid-rule action
+
+  //  1. Make join block and then block
+  LLVMBasicBlockRef then = LLVMAppendBasicBlock(Fn, 
+                           "then.block");
+  LLVMBasicBlockRef join = LLVMAppendBasicBlock(Fn, 
+                           "join.block");
+
+  //  2. Create icmp to evaluate if $3 is true or not:
+  LLVMValueRef zero = LLVMConstInt(LLVMTypeOf($3),0,1); 
+  LLVMValueRef cond = LLVMBuildICmp(Builder, LLVMIntNE, $3,
+                                  zero,"cond");
+  //  3. insert conditional branch
+  LLVMBuildCondBr(Builder,cond,then,join);
+  //  4. position builder in then-block
+  LLVMPositionBuilderAtEnd(Builder,then);
+  //  5. remember join block somewhere, declare new global 
+
+  $<bb>$ = join; /* declare BBjoin at top of file */
+  //  Now stmtlist will be put in the then-block. Excellent!
+
+ } LBRACE stmtlist RBRACE   /*if stmt*/  
+ {
+   // final action
+   //  1. find join block
+  LLVMBasicBlockRef join = $<bb>5;
+  //  2. insert branch to join block
+  LLVMBuildBr(Builder,join);
+  //  3. position builder in join block
+  LLVMPositionBuilderAtEnd(Builder,join);
+  //  done with if
+ } 
+      | WHILE 
+      {
+  // 1. Make a block for the cond
+  LLVMBasicBlockRef cond = LLVMAppendBasicBlock(Fn,"while.cond");
+  // 2. Insert a branch from the current block to cond  
+  LLVMBuildBr(Builder,cond);
+  // 3. Move the builder to the cond block
+  LLVMPositionBuilderAtEnd(Builder, cond);
+  // 4. Remember the cond block ($<bb>2)
+  $<bb>$ = cond;
+
+      }
+LPAREN expr RPAREN 
+{
+// 1. Make the block for the body
+  LLVMBasicBlockRef body = LLVMAppendBasicBlock(Fn,"while.body");
+  // 2. Make the join block
+  LLVMBasicBlockRef join = LLVMAppendBasicBlock(Fn,"while.join");
+
+  // 3. Build a conditional branch to body and join block  
+  LLVMValueRef zero = LLVMConstInt(LLVMTypeOf($4),0,1); 
+  LLVMValueRef cond = LLVMBuildICmp(Builder, LLVMIntNE, $4,
+                                  zero,"cond");
+  LLVMValueRef br = LLVMBuildCondBr(Builder,cond,body,join);
+  
+  // 4. Position builder in the body
+  LLVMPositionBuilderAtEnd(Builder,body);
+  // 5. Remember the join block ($<bb>$)
+  $<bb>$ = join;
+
+
+}
+LBRACE stmtlist RBRACE 
+{
+  // 1. Make an unconditional branch back to $<bb>2
+  LLVMBuildBr(Builder,$<bb>2);
+  // 2. Move builder to $<bb>6
+  LLVMPositionBuilderAtEnd(Builder, $<bb>6);
+}
+/*while stmt*/
       | SEMI /* null stmt */
 ;
 
@@ -132,6 +207,7 @@ expr:
   LLVMValueRef zero = LLVMConstInt(LLVMTypeOf($2),0,1); 
   LLVMValueRef icmp = LLVMBuildICmp(Builder, LLVMIntEQ, $2,
                                   zero,"logical.not");
+
   //$$ = LLVMBuildSelect(Builder, 
   //		       icmp, // condition 
   //                   LLVMConstInt(LLVMInt64Type(),1,1),   // if-true
@@ -154,7 +230,7 @@ int main() {
   LLVMTypeRef IntFnTy = LLVMFunctionType(LLVMInt64Type(),NULL,0,0);
   
   // Make a void function named main (the start of the program!)
-  LLVMValueRef Fn = LLVMAddFunction(Module,"main",IntFnTy);
+  Fn = LLVMAddFunction(Module,"main",IntFnTy);
 
   // Add a basic block to main to hold new instructions
   LLVMBasicBlockRef BB = LLVMAppendBasicBlock(Fn,"entry");
