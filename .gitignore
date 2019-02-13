@@ -7,6 +7,7 @@
 # Ignore directories
 build
 tmp
+p*-test*
 
 # Compiled Object files
 *.slo
