@@ -23,7 +23,7 @@ endif
 
 %.p1.bc:%.p1
 ifdef DEBUG
-	/usr/bin/gdb --args $(P1TOOL) $< $@
+	lldb -- $(P1TOOL) $< $@
 else
 	$(VERB) $(P1TOOL) $< $@
 endif
