@@ -615,6 +615,16 @@ multiplicative_expression:  cast_expression
 
 cast_expression:          unary_expression
 { $$ = $1; }
+                        | LPAREN type_specifier RPAREN cast_expression
+{
+  // Implement 
+  $$ = $4; 
+}
+                        | LPAREN type_specifier STAR RPAREN cast_expression
+{ 
+  // Implement
+  $$ = $5; 
+}
 ;
 
 lhs_expression:           ID 
