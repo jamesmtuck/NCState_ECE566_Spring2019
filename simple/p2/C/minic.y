@@ -198,8 +198,7 @@ declaration:    type_specifier STAR ID opt_initializer SEMICOLON
   else
     {
       symbol_insert($3,  /* map name to alloca */
-		    LLVMBuildAlloca(Builder,LLVMPointerType($1,0),$3), /* build alloca */
-		    0);  /* not an arg */
+		    LLVMBuildAlloca(Builder,LLVMPointerType($1,0),$3)); /* build alloca */
       
       // Store initial value!
       // LLVMBuildStore(Builder, ...
@@ -218,8 +217,8 @@ declaration:    type_specifier STAR ID opt_initializer SEMICOLON
   else
     {
       symbol_insert($2,  /* map name to alloca */
-		    LLVMBuildAlloca(Builder,$1,$2), /* build alloca */
-		    0);  /* not an arg */
+		    LLVMBuildAlloca(Builder,$1,$2)); /* build alloca */
+		      /* not an arg */
 
       // Store initial value if there is one
       // LLVMBuildStore(Builder, ...
@@ -629,13 +628,12 @@ cast_expression:          unary_expression
 
 lhs_expression:           ID 
 {
-  int isArg=0;
-  LLVMValueRef val = symbol_find($1,&isArg);
+  LLVMValueRef val = symbol_find($1);
   $$ = val;
 }
                         | STAR ID
 {
-  LLVMValueRef val = symbol_find($2,NULL);
+  LLVMValueRef val = symbol_find($2);
   $$ = LLVMBuildLoad(Builder,val,"");
 }
 ;
@@ -680,7 +678,7 @@ postfix_expression:       primary_expression
 
 primary_expression:       ID 
 { 
-  LLVMValueRef val = symbol_find($1,NULL);
+  LLVMValueRef val = symbol_find($1);
   $$ = LLVMBuildLoad(Builder,val,"");
 }
                         | constant
@@ -740,7 +738,7 @@ LLVMValueRef BuildFunction(LLVMTypeRef RetType, const char *name,
     {
       LLVMValueRef alloca = LLVMBuildAlloca(Builder,tmp->type,tmp->name);
       LLVMBuildStore(Builder,LLVMGetParam(Function,i),alloca);
-      symbol_insert(tmp->name,alloca,0);
+      symbol_insert(tmp->name,alloca);
       tmp=next_param(tmp);
     }
 

@@ -197,8 +197,7 @@ declaration:    type_specifier STAR ID opt_initializer SEMICOLON
   else
     {
       symbol_insert($3,  /* map name to alloca */
-		    Builder->CreateAlloca(PointerType::get($1,0),NULL,$3), /* build alloca */
-		    0);  /* not an arg */
+		    Builder->CreateAlloca(PointerType::get($1,0),NULL,$3)); /* build alloca */
     }
 
 } 
@@ -212,8 +211,7 @@ declaration:    type_specifier STAR ID opt_initializer SEMICOLON
   else
     {
       symbol_insert($2,  /* map name to alloca */
-		    Builder->CreateAlloca($1,NULL,$2), /* build alloca */
-		    0);  /* not an arg */
+		    Builder->CreateAlloca($1,NULL,$2)); /* build alloca */
     }
 } 
 ;
@@ -606,9 +604,8 @@ cast_expression:          unary_expression
 
 lhs_expression:           ID 
 {
-  int isArg=0;
-  Value* val = symbol_find($1,&isArg);
-  if (isArg)
+  Value* val = symbol_find($1);
+  if (val==NULL)
     {
       // error
     }
@@ -617,9 +614,8 @@ lhs_expression:           ID
 }
                         | STAR ID
 {
-  int isArg=0;
-  Value* val = symbol_find($2,&isArg);
-  if (isArg)
+  Value* val = symbol_find($2);
+  if (val==NULL)
     {
       // error
     }
@@ -669,11 +665,10 @@ postfix_expression:       primary_expression
 
 primary_expression:       ID 
 { 
-  int isArg=0;
-  Value* val = symbol_find($1,&isArg);
-  if (isArg)
-    $$ = val;
-  else
+  Value* val = symbol_find($1);
+  if (val==NULL) {
+    // Handle error
+  } else
     $$ = Builder->CreateLoad(val);
 }
                         | constant
@@ -738,7 +733,7 @@ Value* BuildFunction(Type* RetType, const char *name,
       // map args and create allocas!
       AllocaInst *AI = Builder->CreateAlloca(v[i]);
       Builder->CreateStore(&(*I),(Value*)AI);
-      symbol_insert(vname[i],(Value*)AI,0);
+      symbol_insert(vname[i],(Value*)AI);
     }
 
 

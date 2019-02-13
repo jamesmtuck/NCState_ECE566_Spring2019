@@ -8,7 +8,7 @@ void symbol_pop_scope();
 
 int is_global_scope();
 
-void symbol_insert(const char* name, LLVMValueRef val, int isArg);
-LLVMValueRef symbol_find(const char*,int *isArg);
+void symbol_insert(const char* name, LLVMValueRef val);
+LLVMValueRef symbol_find(const char*);
 
 #endif

@@ -10,7 +10,7 @@ void symbol_pop_scope();
 
 int is_global_scope();
 
-void symbol_insert(const char* name, Value* val, int isArg);
-Value* symbol_find(const char*,int *isArg);
+void symbol_insert(const char* name, Value* val);
+Value* symbol_find(const char*);
 
 #endif

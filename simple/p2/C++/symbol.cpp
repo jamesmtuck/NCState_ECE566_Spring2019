@@ -43,14 +43,13 @@ int is_global_scope()
   return head==NULL;
 }
 
-void symbol_insert(const char* name, Value* val, int isArg)
+void symbol_insert(const char* name, Value* val)
 {
   if (head==NULL)
     return;
 
   struct symbol_info *si = (struct symbol_info*) malloc(sizeof(struct symbol_info));
   si->name = name;
-  si->isArg = isArg;
   si->val = val;
 
   HASH_ADD_KEYPTR( hh, head->map, name, strlen(name), si );
@@ -58,18 +57,16 @@ void symbol_insert(const char* name, Value* val, int isArg)
 
 struct symbol_info * get_symbol_in_scope(const char* name, scope_t *scope);
 
-Value* symbol_find(const char*name,int *isArg)
+Value* symbol_find(const char*name)
 {
   struct symbol_info *si = get_symbol_in_scope(name,head);
 
   if (si)
     {
-      *isArg = si->isArg;
       return si->val;
     }
   else
     {
-      *isArg = 0;
       return M->getNamedGlobal(name);
     }
 }
