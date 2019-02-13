@@ -17,6 +17,7 @@
 %s        FNAME
 
 %option nounput
+%option noinput
 
 %%
 

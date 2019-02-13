@@ -16,6 +16,7 @@
 
 %s        FNAME
 %option nounput
+%option noinput
 
 %%
 
@@ -38,7 +39,7 @@
 
 void usage()
 {
-  printf("./p2cc <options> file1 file2 ...\n"
+  printf("./p2 <options> file1 file2 ...\n"
 	 "Options:                          \n"
 	 "          -h,-?        : print this message\n"
          "          -v,-verbose  : print copious output to indicate state\n"

@@ -54,10 +54,10 @@ main (int argc, char ** argv)
     }
 
   // LLVM idiom for constructing output file.
-  std::unique_ptr<tool_output_file> Out;  
+  std::unique_ptr<ToolOutputFile> Out;  
   std::string ErrorInfo;
   std::error_code EC;
-  Out.reset(new tool_output_file(outfile, EC,
+  Out.reset(new ToolOutputFile(outfile, EC,
   				 sys::fs::F_None));
 
   LLVMContext *Context = new LLVMContext();
@@ -73,7 +73,7 @@ main (int argc, char ** argv)
   if (M && num_errors==0)
     {
       // Dump function to bitcode
-      WriteBitcodeToFile(M,Out->os());
+      WriteBitcodeToFile(*M,Out->os());
       
       // LLVM idiom to save output file
       Out->keep();
