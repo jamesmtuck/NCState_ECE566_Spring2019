@@ -1,18 +1,10 @@
 #include <stdio.h>
 #include <sys/types.h>
-extern int test_11(float);
+extern int test_01(int,int,int);
 
-int test_function(float x)
+int test_function(int a, int b, int c)
 {
-  int j;
-  int i;
-  int sum;
-  sum=0;
-  for(j=0; j<10; j++)
-    for(i=0; i<5; i++)
-      sum = sum + x;
-
-  return sum;
+  return a+b+c;
 }
 
 int main()
@@ -22,8 +14,10 @@ int main()
   int errors=0;
   int success=0;
 
-  for (i=-2; i<20; i++)
-	if (test_11(i)!=test_function(i))
+  for (i=5; i<10; i++)
+    for (j=100; j<103; j++)
+      for (k=-10; k<-8; k++)
+	if (test_01(i,j,k)!=test_function(i,j,k))
 	  errors++;
 	else
 	  success++;

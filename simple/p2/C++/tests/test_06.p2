@@ -1,0 +1,10 @@
+int test_06(int x, int y)
+{
+  int ret;	
+  if (x > y)
+    ret = x;
+  else
+    ret = y;
+
+  return ret;
+}

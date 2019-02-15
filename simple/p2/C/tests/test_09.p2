@@ -1,0 +1,16 @@
+int test_09(int choose, int x, int y)
+{
+  int ret;
+
+  if (y==0)
+    y = y+1;
+  else
+    ;
+
+  if (choose)
+    ret =  x / y;
+  else
+    ret =  x % y;
+
+  return ret;
+}
