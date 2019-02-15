@@ -24,7 +24,7 @@ int main()
 	  success++;
 
   i = 5;
-  if (test_12(&i,NULL) != &i)
+  if (test_12(&i,NULL) != NULL)
     errors++;
   else 
     success++;

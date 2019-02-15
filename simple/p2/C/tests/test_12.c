@@ -24,13 +24,13 @@ int main()
 	  success++;
 
   i = 5;
-  if (test_12(&i,NULL) != &i)
+  if (test_12(&i,NULL) != NULL)
     errors++;
   else 
     success++;
 
   i = 5;
-  if (test_12(NULL,&i) != NULL)
+  if (test_12(NULL,&i) != &i)
     errors++;
   else 
     success++;

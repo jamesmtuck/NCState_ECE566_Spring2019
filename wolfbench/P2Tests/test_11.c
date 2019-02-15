@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <sys/types.h>
-extern int test_11(int);
+extern int test_11(float);
 
 int test_function(float x)
 {
