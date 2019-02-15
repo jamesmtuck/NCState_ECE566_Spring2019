@@ -427,6 +427,10 @@ RPAREN statement
 {
 
 }
+| DO statement WHILE LPAREN expression RPAREN SEMICOLON
+{
+  // 566: implement
+}
 ;
 
 expr_opt:		

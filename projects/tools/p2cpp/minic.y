@@ -399,6 +399,10 @@ WHILE LPAREN {
 {
   // 566: add mid-rule actions to support for-statement
 }
+| DO statement WHILE LPAREN expression RPAREN SEMICOLON
+{
+  // 566: implement
+}
 ;
 
 expr_opt:		
