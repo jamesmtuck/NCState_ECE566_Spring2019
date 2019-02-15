@@ -1,7 +1,7 @@
 int *test_12(int *x, int *y)
 {
   int *ret;
-  ret = 0;
+  ret = (int*) 0;
   if( x && y && *x > *y)
     ret = x;
   else
