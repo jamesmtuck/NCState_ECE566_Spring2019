@@ -15,7 +15,7 @@ VERB:=
 endif
 
 ifdef DEBUG
-GDB = lldb -- 
+GDB = lldb --  
 else
 GDB = 
 endif

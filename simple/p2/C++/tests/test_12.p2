@@ -1,0 +1,11 @@
+int *test_12(int *x, int *y)
+{
+  int *ret;
+  ret = 0;
+  if( x && y && *x > *y)
+    ret = x;
+  else
+    ret = y;
+
+  return ret;
+}
