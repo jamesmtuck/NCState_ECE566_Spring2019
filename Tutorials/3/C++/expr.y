@@ -3,6 +3,10 @@
 #include <cstdlib>
 #include <iostream>
 #include <stdio.h>
+
+#include <map>
+#include <string>
+
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Value.h"
 #include "llvm/IR/Function.h"
@@ -17,11 +21,14 @@
 
 using namespace llvm;
 
+static Function *TheFunction;
 static LLVMContext TheContext;
 static IRBuilder<> Builder(TheContext);
 
 int yylex();
 int yyerror(const char *);
+
+std::map<std::string,Value*> idMap;
 
 %}
 
@@ -36,6 +43,7 @@ int yyerror(const char *);
   char *id;
   int imm;
   Value * val;
+  BasicBlock *bb;
 }
 
 %type <id> ID
@@ -60,8 +68,56 @@ stmtlist :    stmt
 ;
 
 stmt:   ID ASSIGN expr SEMI              /* expression stmt */
-      | IF LPAREN expr RPAREN LBRACE stmtlist RBRACE   /*if stmt*/     
-      | WHILE LPAREN expr RPAREN LBRACE stmtlist RBRACE /*while stmt*/
+{
+// Look to see if we already allocated it
+  Value* var = NULL;
+  if (idMap.find($1)==idMap.end()) {
+     // We haven’t so make a spot on the stack
+    var = Builder.CreateAlloca(Builder.getInt64Ty(),nullptr,$1);
+     // remember this location and associate it with $1
+    idMap[$1] = var;
+  } else {
+    var = idMap[$1];
+  }
+  // store $3 into $1’s location in memory
+  Builder.CreateStore($3,var);
+}
+      | IF LPAREN expr RPAREN 
+      {
+	BasicBlock *then = BasicBlock::Create(TheContext,"if.then",TheFunction);
+	BasicBlock *join = BasicBlock::Create(TheContext,"if.join",TheFunction);
+
+	
+	Builder.CreateCondBr(Builder.CreateICmpNE($3,Builder.getInt64(0)),then,join);
+	Builder.SetInsertPoint(then);
+	$<bb>$ = join;
+	// now, stmtlist will be put inside then block
+      }
+        LBRACE stmtlist RBRACE   /*if stmt*/     
+      {
+	// merge back to join block
+	Builder.CreateBr($<bb>5);
+	Builder.SetInsertPoint($<bb>5);
+      }
+| WHILE {
+  BasicBlock *expr = BasicBlock::Create(TheContext,"w.expr",TheFunction);
+  Builder.CreateBr(expr);
+  Builder.SetInsertPoint(expr);
+  }
+LPAREN expr RPAREN 
+{
+  BasicBlock *body = BasicBlock::Create(TheContext,"w.body",TheFunction);
+  BasicBlock *exit = BasicBlock::Create(TheContext,"w.exit",TheFunction);
+  Builder.CreateCondBr(Builder.CreateICmpNE($4, Builder.getInt64(0)),body,exit);
+  Builder.SetInsertPoint(body);
+  $<bb>$ = exit;
+}
+LBRACE stmtlist RBRACE 
+{
+  Builder.CreateBr($<bb>6);
+  Builder.SetInsertPoint($<bb>6);	
+}
+/*while stmt*/
       | SEMI /* null stmt */
 ;
 
@@ -69,11 +125,12 @@ stmt:   ID ASSIGN expr SEMI              /* expression stmt */
 expr: 
  IMMEDIATE                 
  {
-   $$ = Builder.getInt32($1);
- }
+   $$ = Builder.getInt64($1);
+  }
 | ID
  {
-
+   Value * addr = idMap[$1];
+   $$ = Builder.CreateLoad(addr,$1);
  }
 | expr PLUS expr  
  {
@@ -87,11 +144,11 @@ expr:
 
 | expr MULTIPLY expr  
 {
-
+   $$ = Builder.CreateMul($1,$3);
 }  
 | expr DIVIDE expr 
 {
-
+   $$ = Builder.CreateSDiv($1,$3);
 }  
 
 | LPAREN expr RPAREN 
@@ -106,6 +163,9 @@ expr:
 
 | NOT expr
 {
+  //  $$ = Builder.CreateICmpEQ($2,Builder.getInt64(0));
+  Value *icmp = Builder.CreateICmpEQ($2,Builder.getInt64(0));
+  $$ = Builder.CreateZExt(icmp,Builder.getInt64Ty());
 
 }
 ;
@@ -119,15 +179,15 @@ int main() {
   
   // Create void function type with no arguments
   FunctionType *FunType = 
-    FunctionType::get(Builder.getInt32Ty(),false);
+    FunctionType::get(Builder.getInt64Ty(),false);
   
   // Create a main function
-  Function *Function = Function::Create(FunType,  
+  TheFunction = Function::Create(FunType,  
 					GlobalValue::ExternalLinkage, "main",M);
   
   //Add a basic block to main to hold instructions
   BasicBlock *BB = BasicBlock::Create(TheContext, "entry",
-				      Function);
+  				      TheFunction);
   // Ask builder to place new instructions at end of the
   // basic block
   Builder.SetInsertPoint(BB);
