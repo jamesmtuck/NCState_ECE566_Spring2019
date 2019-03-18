@@ -1,3 +1,3 @@
 add_subdirectory(utils)
-#add_subdirectory(sample)
+add_subdirectory(analysis)
 
