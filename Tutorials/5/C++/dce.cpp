@@ -28,13 +28,122 @@ static LLVMContext TheContext;
 
 void NoOptimization(Module *M)
 {
-  
+  printf("NoOptimization is running!\n");
+
+  for(Module::iterator mit = M->begin(); 
+      mit != M->end(); mit++)
+    {
+      Function &F = *mit;
+      Function *F_ptr = &*mit;
+
+      for(Function::iterator fit = F.begin(); 
+	  fit != F.end();
+	  fit++)
+	{
+	  BasicBlock &BB = *fit;
+
+	  for(BasicBlock::iterator bit = BB.begin();
+	      bit != BB.end();
+	      bit++)
+	    {
+	      Instruction &I = *bit;
+	      LLVMDumpValue(wrap(&I));
+	    }
+
+
+	}
+
+
+    }
   
 }
 
 
 int isDead(Instruction * i)
 {
+  // All conditions passed
+  LLVMValueRef I = wrap(i);
+  
+  // Not dead, because there are uses
+  if(LLVMGetFirstUse(I)!=NULL) {
+    return 0;
+
+#if 0
+  if(LLVMGetFirstUse(I)==NULL) {
+    printf("No uses here: \n");
+    LLVMDumpValue(I);
+   return 0;
+  } else {
+    LLVMUseRef use;
+    LLVMDumpValue(I);
+    printf(" ---- Used by: \n");
+    for(use = LLVMGetFirstUse(I);
+	use != NULL;
+	use = LLVMGetNextUse(use))
+      {
+	LLVMValueRef j = LLVMGetUser(use);
+	LLVMDumpValue(j);
+      }
+    printf("\n");
+  }
+#endif
+  
+  LLVMOpcode opcode = LLVMGetInstructionOpcode(I);
+  switch(opcode) {
+  // when in doubt, keep it! add opcode here to remove:
+  case LLVMFNeg:
+  case LLVMAdd:
+  case LLVMFAdd: 	
+  case LLVMSub:
+  case LLVMFSub: 	
+  case LLVMMul:
+  case LLVMFMul: 	
+  case LLVMUDiv:	
+  case LLVMSDiv:	
+  case LLVMFDiv:	
+  case LLVMURem: 	
+  case LLVMSRem: 	
+  case LLVMFRem: 	
+  case LLVMShl: 	
+  case LLVMLShr: 	
+  case LLVMAShr: 	
+  case LLVMAnd: 	
+  case LLVMOr: 	
+  case LLVMXor: 	
+  case LLVMAlloca:
+  case LLVMGetElementPtr: 	
+  case LLVMTrunc: 	
+  case LLVMZExt: 	
+  case LLVMSExt: 	
+  case LLVMFPToUI: 	
+  case LLVMFPToSI: 	
+  case LLVMUIToFP: 	
+  case LLVMSIToFP: 	
+  case LLVMFPTrunc: 	
+  case LLVMFPExt: 	
+  case LLVMPtrToInt: 	
+  case LLVMIntToPtr: 	
+  case LLVMBitCast: 	
+  case LLVMAddrSpaceCast: 	
+  case LLVMICmp: 	
+  case LLVMFCmp: 	
+  case LLVMPHI: 
+  case LLVMSelect: 
+  case LLVMExtractElement: 	
+  case LLVMInsertElement: 	
+  case LLVMShuffleVector: 	
+  case LLVMExtractValue: 	
+  case LLVMInsertValue: 
+    // Success!
+    return 1;
+
+  case LLVMLoad: if(!LLVMGetVolatile(I)) return 1; // Success
+
+  // all others must be kept
+  default:
+    break;
+  }
+
   // Failed
   return 0;
 }
