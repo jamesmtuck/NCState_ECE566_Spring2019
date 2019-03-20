@@ -46,6 +46,8 @@ void RunDeadCodeElimination(Module *M)
 
 }
 
+int DCE_count=0;
+
 int main (int argc, char ** argv)
 {  
   if (argc < 3) {
@@ -85,6 +87,8 @@ int main (int argc, char ** argv)
   } else {
     fprintf(stderr,"Error: %s not created.\n",argv[2]); 
   }
+
+  fprintf(stderr,"Removed %d instructions.",DCE_count);
 
   return 0;
 }
