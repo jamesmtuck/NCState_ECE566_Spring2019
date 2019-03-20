@@ -21,10 +21,13 @@
 
 #include <memory>
 #include <algorithm>
+#include <set>
 
 using namespace llvm;
 
 static LLVMContext TheContext;
+
+int DCE_count=0;
 
 void NoOptimization(Module *M)
 {
@@ -33,8 +36,8 @@ void NoOptimization(Module *M)
   for(Module::iterator mit = M->begin(); 
       mit != M->end(); mit++)
     {
-      Function &F = *mit;
-      Function *F_ptr = &*mit;
+      //Function &F = *mit;
+      //Function *F_ptr = &*mit;
 
       for(Function::iterator fit = F.begin(); 
 	  fit != F.end();
@@ -53,7 +56,6 @@ void NoOptimization(Module *M)
 
 	}
 
-
     }
   
 }
@@ -65,33 +67,12 @@ int isDead(Instruction * i)
   LLVMValueRef I = wrap(i);
   
   // Not dead, because there are uses
-  if(LLVMGetFirstUse(I)!=NULL) {
+  if(LLVMGetFirstUse(I)!=NULL)
     return 0;
-
-#if 0
-  if(LLVMGetFirstUse(I)==NULL) {
-    printf("No uses here: \n");
-    LLVMDumpValue(I);
-   return 0;
-  } else {
-    LLVMUseRef use;
-    LLVMDumpValue(I);
-    printf(" ---- Used by: \n");
-    for(use = LLVMGetFirstUse(I);
-	use != NULL;
-	use = LLVMGetNextUse(use))
-      {
-	LLVMValueRef j = LLVMGetUser(use);
-	LLVMDumpValue(j);
-      }
-    printf("\n");
-  }
-#endif
   
   LLVMOpcode opcode = LLVMGetInstructionOpcode(I);
   switch(opcode) {
   // when in doubt, keep it! add opcode here to remove:
-  case LLVMFNeg:
   case LLVMAdd:
   case LLVMFAdd: 	
   case LLVMSub:
@@ -151,11 +132,50 @@ int isDead(Instruction * i)
 
 void RunDeadCodeElimination(Module *M)
 {
+  std::set<Instruction*> worklist;
 
+  for(Module::iterator mit = M->begin(); 
+      mit != M->end(); mit++)
+    {
+      Function &F = *mit;
+      Function *F_ptr = &*mit;
 
+      for(Function::iterator fit = F.begin(); 
+	  fit != F.end();
+	  fit++)
+	{
+	  BasicBlock &BB = *fit;
+
+	  for(BasicBlock::iterator bit = BB.begin();
+	      bit != BB.end();
+	      bit++)
+	    {
+	      Instruction &I = *bit;
+	      worklist.insert(&I);
+	    }
+	}
+
+      while(worklist.size()>0) {
+	Instruction* i = *worklist.begin();
+	worklist.erase(i);
+	
+	if(isDead(i))
+	  {
+	    for(unsigned op=0; op<i->getNumOperands(); op++)
+	      {
+		if (  isa<Instruction>(i->getOperand(op)) ) {
+		  Instruction *o = dyn_cast<Instruction>(i->getOperand(op));
+		  worklist.insert(o);
+		}
+	      }
+	    i->eraseFromParent();
+	    DCE_count++;
+	  }
+      }     
+    }
 }
 
-int DCE_count=0;
+
 
 int main (int argc, char ** argv)
 {  
@@ -184,9 +204,8 @@ int main (int argc, char ** argv)
     return 1;
   }
 
-  NoOptimization(M.get());
-
-  M->print(errs(),nullptr);
+  RunDeadCodeElimination(M.get());
+  //NoOptimization(M.get());
 
   char *msg;
   LLVMBool res = LLVMVerifyModule(wrap(M.get()), LLVMPrintMessageAction, &msg);
