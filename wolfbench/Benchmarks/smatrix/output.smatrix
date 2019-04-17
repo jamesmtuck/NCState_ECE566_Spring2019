@@ -1,0 +1,6 @@
+Matrix Multiplication Kernel (1024x1024)
+Phase 2
+Native Matrix Multiplication
+Phase 3
+Verification total=8.22218e+12
+exit 0

@@ -24,7 +24,7 @@ SOURCES = em3d.c main.c make_graph.c util.c args.c
 INFILE  = /dev/null
 OUTFILE = $(programs)$(EXTRA_SUFFIX).out
 ARGS    = 160000 15 88
-COMPARE = @abs_srcdir@/em3d.out $(OUTFILE)
+COMPARE = @abs_srcdir@/output.em3d $(OUTFILE)
 
 include @abs_top_srcdir@/Makefile.benchmark
 include @top_builddir@/Makefile.config

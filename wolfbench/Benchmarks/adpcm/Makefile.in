@@ -24,7 +24,7 @@ SOURCES = adpcm.c rawdaudio.c
 INFILE  = @abs_srcdir@/large.pcm
 OUTFILE = output_large.adpcm
 ARGS    = 
-COMPARE = @abs_srcdir@/output_large.adpcm $(OUTFILE)
+COMPARE = `tar xzf @abs_srcdir@/output_large.adpcm.tgz; echo output_large.adpcm` $(OUTFILE)
 
 include @abs_top_srcdir@/Makefile.benchmark
 include @top_builddir@/Makefile.config

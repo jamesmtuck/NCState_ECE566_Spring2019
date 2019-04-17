@@ -24,7 +24,7 @@ SOURCES = hanoi.c
 INFILE  = /dev/null
 OUTFILE = $(programs)$(EXTRA_SUFFIX).out
 ARGS    = 2000 18
-COMPARE = @abs_srcdir@/hanoi.out $(OUTFILE)
+COMPARE = @abs_srcdir@/output.hanoi $(OUTFILE)
 
 include @abs_top_srcdir@/Makefile.benchmark
 include @top_builddir@/Makefile.config

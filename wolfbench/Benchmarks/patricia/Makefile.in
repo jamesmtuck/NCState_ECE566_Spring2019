@@ -24,7 +24,7 @@ SOURCES = patricia.c patricia_test.c
 INFILE  = /dev/null
 OUTFILE = $(programs)$(EXTRA_SUFFIX).out
 ARGS    = @abs_srcdir@/large.udp
-COMPARE = @abs_srcdir@/patricia.out $(OUTFILE)
+COMPARE = @abs_srcdir@/output.patricia $(OUTFILE)
 
 include @abs_top_srcdir@/Makefile.benchmark
 include @top_builddir@/Makefile.config

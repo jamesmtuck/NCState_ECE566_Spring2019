@@ -24,7 +24,7 @@ SOURCES = bitcnt_1.c bitcnt_2.c bitcnt_3.c bitcnt_4.c bitcnts.c bitfiles.c bitst
 INFILE  = /dev/null
 OUTFILE = $(addsuffix $(EXTRA_SUFFIX),$(programs)).out
 ARGS    = 1125000
-COMPARE = @abs_srcdir@/bitcount.out $(OUTFILE)
+COMPARE = @abs_srcdir@/output.bitcount $(OUTFILE)
 
 include @abs_top_srcdir@/Makefile.benchmark
 include @top_builddir@/Makefile.config

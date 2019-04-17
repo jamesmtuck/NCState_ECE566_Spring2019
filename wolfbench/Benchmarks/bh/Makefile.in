@@ -24,7 +24,7 @@ SOURCES = newbh.c util.c args.c
 INFILE  = /dev/null
 OUTFILE = $(addsuffix $(EXTRA_SUFFIX).out,$(programs))
 ARGS    = 11000 1
-COMPARE = @abs_srcdir@/bh.out $(addsuffix $(EXTRA_SUFFIX).out,$(programs))
+COMPARE = @abs_srcdir@/output.bh $(addsuffix $(EXTRA_SUFFIX).out,$(programs))
 
 include @abs_top_srcdir@/Makefile.benchmark
 include @top_builddir@/Makefile.config

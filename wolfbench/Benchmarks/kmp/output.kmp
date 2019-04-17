@@ -1,0 +1,27 @@
+Benchmark begin...
+KMP with reference input set
+ 1 Pattern:gbaefg: found 2 times
+ 2 Pattern:adfecg: found 2 times
+ 3 Pattern:cbfade: found 4 times
+ 4 Pattern:fbbgfe: found 2 times
+ 5 Pattern:bdeccc: found 4 times
+ 6 Pattern:fbcgec: found 2 times
+ 7 Pattern:ebbceb: found 5 times
+ 8 Pattern:efdbcb: found 3 times
+ 9 Pattern:afbede: found 5 times
+10 Pattern:adcdgd: found 3 times
+11 Pattern:fdcdbd: found 6 times
+12 Pattern:eaegdb: found 0 times
+13 Pattern:bbfacg: found 1 times
+14 Pattern:abefee: found 0 times
+15 Pattern:ebdgae: found 4 times
+16 Pattern:ebecga: found 2 times
+17 Pattern:fecbge: found 2 times
+18 Pattern:dcfffb: found 1 times
+19 Pattern:fgcddg: found 3 times
+20 Pattern:bcfege: found 1 times
+21 Pattern:fbfdgf: found 2 times
+22 Pattern:ceddbe: found 5 times
+23 Pattern:gaeacc: found 3 times
+Benchmark finish...
+exit 0

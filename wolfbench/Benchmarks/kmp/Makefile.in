@@ -24,7 +24,7 @@ SOURCES = kmp.c rndnums.c
 INFILE  = /dev/null
 OUTFILE = $(addsuffix $(EXTRA_SUFFIX).out,$(programs))
 ARGS    = ref
-COMPARE = $(OUTFILE) @abs_srcdir@/kmp.out
+COMPARE = $(OUTFILE) @abs_srcdir@/output.kmp
 
 include @abs_top_srcdir@/Makefile.benchmark
 include @top_builddir@/Makefile.config

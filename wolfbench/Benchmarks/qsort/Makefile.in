@@ -24,7 +24,7 @@ SOURCES = qsort_large.c
 INFILE  = /dev/null
 OUTFILE = $(programs)$(EXTRA_SUFFIX).out
 ARGS    = @abs_srcdir@/input_large.dat
-COMPARE = @abs_srcdir@/qsort.out $(OUTFILE)
+COMPARE = @abs_srcdir@/output.qsort $(OUTFILE)
 
 include @abs_top_srcdir@/Makefile.benchmark
 include @top_builddir@/Makefile.config

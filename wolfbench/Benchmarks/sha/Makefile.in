@@ -24,7 +24,7 @@ SOURCES = sha_driver.c sha.c
 INFILE  = /dev/null
 OUTFILE = $(programs)$(EXTRA_SUFFIX).out
 ARGS    = @abs_srcdir@/input_large.asc
-COMPARE = @abs_srcdir@/sha.out $(OUTFILE)
+COMPARE = @abs_srcdir@/output.sha $(OUTFILE)
 
 include @abs_top_srcdir@/Makefile.benchmark
 include @top_builddir@/Makefile.config

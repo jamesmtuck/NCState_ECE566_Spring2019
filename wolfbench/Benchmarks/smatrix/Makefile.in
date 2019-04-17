@@ -24,7 +24,7 @@ SOURCES = smatrix.c
 INFILE  = /dev/null
 OUTFILE = $(programs)$(EXTRA_SUFFIX).out
 ARGS    = 1024
-COMPARE = $(OUTFILE) @abs_srcdir@/smatrix.out
+COMPARE = $(OUTFILE) @abs_srcdir@/output.smatrix
 
 # set longer timeout period for smatrix, default is 10s, raise to 20s
 TIMEOUT = 20

@@ -24,7 +24,7 @@ SOURCES = susan.c
 INFILE  = /dev/null
 OUTFILE = $(programs)$(EXTRA_SUFFIX).out
 ARGS    = @abs_srcdir@/input_large.pgm output_large$(EXTRA_SUFFIX).smoothing.pgm -s -d 15
-COMPARE = @abs_srcdir@/output_large.smoothing.pgm output_large$(EXTRA_SUFFIX).smoothing.pgm @abs_srcdir@/$(programs).out $(OUTFILE)
+COMPARE = @abs_srcdir@/output_large.smoothing.pgm output_large$(EXTRA_SUFFIX).smoothing.pgm @abs_srcdir@/output.$(programs) $(OUTFILE)
 
 include @abs_top_srcdir@/Makefile.benchmark
 include @top_builddir@/Makefile.config
