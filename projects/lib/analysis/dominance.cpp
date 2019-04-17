@@ -100,6 +100,10 @@ LLVMBasicBlockRef LLVMFirstDomChild(LLVMBasicBlockRef BB)
 {
   UpdateDominators(unwrap(BB)->getParent());
   DomTreeNodeBase<BasicBlock> *Node = DT->getNode(unwrap(BB));
+
+  if(Node==NULL)
+    return NULL;
+
   DomTreeNodeBase<BasicBlock>::iterator it = Node->begin();
   if (it!=Node->end())
     return wrap((*it)->getBlock());
