@@ -8,4 +8,4 @@ else()
   llvm_map_components_to_libraries(llvm_libs bitreader bitwriter asmparser irreader instrumentation scalaropts ipo vectorize)
 endif()
 
-target_link_libraries(p4 ${llvm_libs} analysis transform utils)
+target_link_libraries(p4 ${llvm_libs} transform analysis utils)
